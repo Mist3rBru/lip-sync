@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lip Sync</title>
+  </head>
+  <body>
+    <div>
+      <div>
+        <h2>Gif</h2>
+        <label for="gif-speed">Speed (ms)</label>
+        <input
+          id="gif-speed"
+          type="number"
+          value="300"
+          step="50"
+          min="200"
+          max="1000"
+        />
+        <label for="gif-text">Text</label>
+        <input id="gif-text" type="text" />
+        <button type="button" id="gif-start">Start</button>
+        <button type="button" id="gif-stop">Stop</button>
+        <button type="button" id="gif-clear">Clear</button>
+      </div>
+      <div
+        id="gif-out"
+        style="display: flex; justify-content: center; align-items: center"
+      ></div>
+      <div>
+        <h2>Sync</h2>
+        <textarea id="sync-text" rows="10" style="width: 100%"></textarea>
+      </div>
+      <div
+        id="sync-out"
+        style="display: flex; flex-wrap: wrap; padding-left: 7rem"
+      ></div>
+    </div>
+    <script src="./assets/index.js"></script>
+  </body>
+</html>
