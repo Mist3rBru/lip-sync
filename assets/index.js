@@ -1,14 +1,21 @@
-const images = [
-  'A,E,I.png',
-  'B,M,P.png',
-  'C,D,N,S,T,X,Y,Z.png',
-  'F,V.png',
-  'J,CH,SH.png',
-  'L.png',
-  'O.png',
-  'Q,W.png',
-  'R.png',
-]
+const images = new Map(
+  [
+    'A,E,I.png',
+    'B,M,P.png',
+    'C,D,N,S,T,X,Y,Z.png',
+    'F,V.png',
+    'J,CH,SH.png',
+    'L.png',
+    'O.png',
+    'Q,W.png',
+    'R.png',
+  ].flatMap(image =>
+    image
+      .slice(0, image.indexOf('.'))
+      .split(',')
+      .map(l => [l, image]),
+  ),
+)
 
 function normalize(text) {
   return text
@@ -27,25 +34,28 @@ function formatSyncNode(text, image) {
     : `<div style="margin: 0 1rem;"></div>`
 }
 
-function getSync(text) {
+function getSync(text, syncCb) {
   const result = []
+  const onSync =
+    syncCb ??
+    ((chunk, image) => {
+      result.push([chunk, image])
+    })
+
   for (let i = 0; i < text.length; i++) {
-    if (text[i] === ' ') {
-      result.push(['', ''])
+    if (!/[A-Za-z]/.test(text[i])) {
+      onSync('', '')
       continue
     }
     const syllable = normalize(text[i] + text[i + 1])
-    const syllableImage = images.find(image => image.includes(syllable))
-    if (syllableImage) {
-      result.push([syllable, syllableImage])
-      i++
-      continue
-    }
     const letter = normalize(text[i])
-    const letterImage = images.find(image => image.includes(letter))
-    if (letterImage) {
-      result.push([text[i].toUpperCase(), letterImage])
-      continue
+    if (images.has(syllable)) {
+      onSync(syllable, images.get(syllable))
+      i++
+    } else if (images.has(letter)) {
+      onSync(text[i].toUpperCase(), images.get(letter))
+    } else {
+      console.error('Missing char: ', letter)
     }
   }
   return result
@@ -79,10 +89,9 @@ document.getElementById('gif-clear').addEventListener('click', () => {
 
 document.getElementById('sync-text').addEventListener('input', e => {
   const text = e.target.value
-  const sync = getSync(text)
   const syncOut = document.getElementById('sync-out')
   syncOut.innerHTML = ''
-  for (const [text, image] of sync) {
-    syncOut.innerHTML += formatSyncNode(text, image)
-  }
+  getSync(text, (chunk, image) => {
+    syncOut.innerHTML += formatSyncNode(chunk, image)
+  })
 })
